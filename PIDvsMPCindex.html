@@ -1,0 +1,1080 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Changed description for the project page -->
+    <meta name="description" content="Detailed analysis and comparison of PID and MPC controllers for high-speed vehicle cornering in CARLA. A project by Reuben Mathew.">
+    
+    <!-- Changed title for the project page -->
+    <title>PID vs MPC CARLA Sim - Reuben Mathew</title>
+    <meta name="author" content="Reuben Mathew">
+    
+    <link rel="stylesheet" type="text/css" href="PIDvsMPCstylesheet.css"> <!-- Your existing CSS file -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
+    
+    <!-- Preload your fonts for better performance -->
+    <link rel="preload" href="https://fonts.gstatic.com/s/lato/v15/S6uyw4BMUTPHjx4wXiWtFCc.woff2" as="font" type="font/woff2" crossorigin>
+  </head>
+
+  <body>
+    <div class="container">
+      <nav class="navbar">
+        <div class="navbar-center">
+          <a href="index.html">Home</a>
+          <a href="#control-methodology">Methodology and Control</a>
+          <a href="#video-demonstrations">Video Demonstration</a>
+          <a href="#results-analysis">Results</a>
+          <div class="theme-toggle" style="margin-left: auto;">
+            <label class="switch">
+              <input type="checkbox" id="theme-toggle">
+              <span class="slider round"></span>
+            </label>
+            <span class="toggle-label">Dark Mode</span>
+          </div>
+        </div>
+      </nav>
+  
+      <!-- Start of New Project Content -->
+      <div style="width:100%;max-width:800px;margin-right:auto;margin-left:auto;padding:20px 2.5%;">
+        <h1 class="name" style="text-align: center;"> Comparative Analysis of PID and Model Predictive Control for High-Speed Vehicle Cornering in CARLA</h1>
+        <p style="text-align:center;">
+          <strong>Course:</strong> ME 548 – Linear Multivariable Control &nbsp; | &nbsp;
+          <strong>Project Type:</strong> Individual &nbsp; | &nbsp;
+          <strong>Author:</strong> Reuben Mathew &nbsp; | &nbsp;
+          <strong>Date:</strong> Spring, 2025
+        </p>
+        
+        <h2>Overview</h2>
+        <p>
+          This project investigates the performance of Proportional-Integral-Derivative (PID) and Model Predictive Control (MPC) strategies in 
+          high-speed autonomous vehicle cornering using the CARLA simulator. While PID is known for its simplicity and ease of tuning, it 
+          lacks predictive capabilities, which may limit its performance during aggressive maneuvers. In contrast, MPC utilizes a dynamic model to 
+          optimize control inputs over a prediction horizon, enabling it to handle constraints and anticipate future states.
+        </p>
+        <p>
+          The project focuses on benchmarking both control methods on a curved road at increasing speeds (115–160 km/h), 
+          analyzing lane-keeping performance, stability, responsiveness, and control effort. Metrics such as lateral deviation, heading error, steering 
+          smoothness, braking patterns, and average speed are used for comparison. This work offers insights into the trade-offs between classical and 
+          model-based control strategies in the context of high-speed driving.
+        </p>
+
+        <h2>Motivation</h2>
+        <p>
+          The motivation for this project stems from an interest in how classical and modern control strategies perform in the context of future autonomous driving. 
+          While self-driving cars are becoming increasingly prevalent, they are typically seen operating at relatively modest speeds, especially in urban environments. 
+          However, as autonomous technology evolves, it is expected that self-driving vehicles will be required to perform safely and reliably at highway or 
+          expressway speeds — a scenario that demands higher responsiveness and stability from their control systems.
+        </p>
+        <p>
+          Among the most widely adopted control approaches in autonomous vehicles are PID (Proportional-Integral-Derivative) and MPC (Model Predictive Control). 
+          This project aims to explore which of these strategies may offer better performance under high-speed, curved road conditions. 
+          The findings could be relevant not only for future self-driving vehicles operating at faster speeds but also for domains such as autonomous racing, 
+          including F1.
+        </p>
+        <p>
+          Beyond practical applications, this project also serves a personal purpose: having already worked with PID controllers and learning MPC in the current 
+          academic quarter, I was curious to compare their real-world behavior and limitations in a rigorous testing environment. 
+          Combining this curiosity with a long-standing passion for cars made it natural to explore this comparison in the context of vehicle dynamics.
+        </p>
+
+        <h2>Objectives</h2>
+        <ul>
+          <li>To evaluate and compare the performance of PID and MPC controllers in high-speed cornering scenarios.</li>
+          <li>To measure controller effectiveness using cross-track error, heading deviation, and lane stability.</li>
+          <li>To assess responsiveness and control smoothness using steering, throttle, and brake effort.</li>
+          <li>To determine which controller maintains higher stability and performance across increasing speeds.</li>
+          <li>To provide visual and statistical evidence for controller behavior and effectiveness using simulation data.</li>
+        </ul>
+
+        <h2>Simulation Environment</h2>
+        <p>
+          All experiments were conducted using <a href="https://carla.org/" target="_blank" rel="noopener noreferrer">CARLA 0.9.14</a>, 
+          an open-source simulator for autonomous driving research. Python 3.10 was used to interface with CARLA’s API.
+        </p>
+        <p>
+          The vehicle used was the <strong>Mercedes Coupe 2020</strong> from the CARLA vehicle blueprint library. The simulation took place in 
+          <a href="https://carla.readthedocs.io/en/latest/map_town04/" target="_blank" rel="noopener noreferrer"><strong>Town 4</strong></a>, 
+          which includes two distinct types of curved segments:
+        </p>
+
+        <ul>
+          <li>2 turns with approximately 60-meter radius (no banking)</li>
+          <li>4 turns with approximately 165-meter radius (no banking)</li>
+        </ul>
+        <p>
+          These road geometries were selected to test the controllers' ability to maintain lane position and stability under different levels of curvature at high speeds (115–160 km/h).
+        </p>
+
+        <!-- Side-by-side images -->
+        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 15px;">
+          <div style="flex: 1 1 48%;">
+            <img src="town04aerial.jpg" alt="CARLA Simulator" style="width: 100%; height: auto;">
+            <p style="text-align:center;"><small>Figure: CARLA Town 4 Track Aerial View</small></p>
+          </div>
+          <div style="flex: 1 1 48%;">
+            <img src="town04track.png" alt="Town 4 Track Layout" style="width: 100%; height: auto;">
+            <p style="text-align:center;"><small>Figure: Town 4 track</small></p>
+          </div>
+        </div>
+        <p>
+          Both the PID and MPC models were tuned specifically for <strong>maximum speed</strong> operation while maintaining <strong>moderate stability</strong> to evaluate performance under aggressive cornering scenarios. This tuning approach reflects real-world constraints in high-speed autonomous driving where responsiveness is critical, but excessive conservatism may limit top performance.
+        </p>
+
+        <p>
+          <strong>Assumptions: </strong>The simulation environment assumes ideal operating conditions without perception or estimation uncertainty. Key assumptions include:
+        </p>
+        <ul>
+          <li><strong>Full-State Availability:</strong> All vehicle states (position, velocity, heading, etc.) are directly accessible without the need for estimation or sensor fusion.</li>
+          <li><strong>No Perception Stack:</strong> The simulation excludes object detection, classification, or semantic understanding. No obstacle avoidance logic is implemented.</li>
+          <li><strong>Single-Agent Control:</strong> The vehicle operates in a static, obstacle-free environment with no interaction with other agents or traffic.</li>
+          <li><strong>Vehicle Dynamics Model:</strong> Control logic is based on an ideal kinematic bicycle model. Effects such as tire slip, actuator delay, or dynamic load transfer are not considered.</li>
+          <li><strong>Failure Criteria and Speed Limit:</strong> Drifts of up to 90° from the lane heading are considered valid. Any yaw deviation beyond 90° by both the vehicles, or collisions with stationary objects, are treated as failure conditions. Based on empirical testing on the Town04 track, the maximum reliably achievable speed was found to be 160 km/h for atleast one of the cars.</li>
+        </ul>
+
+        <!-- Optional: Show Libraries Used -->
+        <details style="margin-top: 20px;margin-bottom:20px">
+          <summary><strong>Libraries Used</strong></summary>
+          <pre><code>
+        import carla
+        import numpy as np
+        import time
+        import math
+        import random
+        import traceback
+        import matplotlib.pyplot as plt
+        from scipy.optimize import minimize
+        import pandas as pd
+        import os
+          </code></pre>
+        </details>
+
+        <section id="control-methodology" style="margin-top:30px;">
+        <h2>Control Strategy</h2>
+        <p>
+          This project implements and compares two distinct control strategies for high-speed vehicle navigation in CARLA:
+          Model Predictive Control (MPC) and Proportional-Integral-Derivative (PID) control. Both controllers aim to achieve a
+          target speed of <strong>140.0 km/h</strong> while accurately tracking a predefined path. The simulation operates
+          with a fixed time step (<code>SIMULATION_STEP</code>) of <strong>0.05 seconds</strong>. The vehicle model used has a
+          wheelbase (<code>VEHICLE_L</code>) of <strong>2.8 meters</strong>.
+        </p>
+
+        <hr style="margin: 20px 0;">
+
+        <h3>Model Predictive Control (MPC)</h3>
+        <p>
+          MPC is an advanced control strategy that uses an explicit model of the vehicle to predict its future states
+          over a finite time horizon. It then optimizes a sequence of control inputs (steering and acceleration)
+          by minimizing a predefined cost function. This process is repeated at each time step, providing a proactive
+          and optimal control action.
+        </p>
+
+        <h4>MPC Parameters:</h4>
+        <ul>
+          <li><strong>Prediction Horizon (<code>MPC_HORIZON</code>):</strong> 7 steps</li>
+          <li><strong>Discretization Time Step (<code>MPC_DT</code>):</strong> 0.05 seconds (same as <code>SIMULATION_STEP</code>)</li>
+          <li><strong>Maximum Steering Angle (<code>MAX_STEER_RAD</code>):</strong> ±45 degrees</li>
+          <li><strong>Maximum Acceleration (<code>MAX_ACCEL</code>):</strong> +2.0 m/s<sup>2</sup></li>
+          <li><strong>Minimum Acceleration (Braking) (<code>MIN_ACCEL</code>):</strong> -2.0 m/s<sup>2</sup></li>
+        </ul>
+
+        <h4>Vehicle Model (Kinematic Bicycle Model):</h4>
+        <p>
+          The MPC utilizes a kinematic bicycle model to predict the vehicle's state. The state is defined as
+          <code>[x, y, ψ, v]</code>, representing the vehicle's X-coordinate, Y-coordinate, yaw angle, and speed, respectively.
+          The control inputs are acceleration (<code>a</code>) and steering angle (<code>δ</code>).
+        </p>
+        <div style="text-align: center; margin-top: 15px; margin-bottom: 15px;">
+          <img src="kinematic bicycle model.png" alt="Kinematic Bicycle Model Diagram" style="max-width: 50%; height: auto; border-radius: 6px;">
+        </div>
+        <p style="text-align:center;"><small>Figure: Kinematic Bicycle Model</small></p>
+        <p>The discrete-time state update equations are:</p>
+        <pre class="code-block">
+                                    x<sub>k+1</sub> = x<sub>k</sub> + v<sub>k</sub> · cos(ψ<sub>k</sub>) · dt
+                                    y<sub>k+1</sub> = y<sub>k</sub> + v<sub>k</sub> · sin(ψ<sub>k</sub>) · dt
+                                    ψ<sub>k+1</sub> = ψ<sub>k</sub> + (v<sub>k</sub> / L) · tan(δ<sub>k</sub>) · dt
+                                    v<sub>k+1</sub> = v<sub>k</sub> + a<sub>k</sub> · dt
+        </pre>
+        <p>Where <code>L</code> is the wheelbase and <code>dt</code> is the time step.</p>
+
+        <h4>Cost Function:</h4>
+        <p>
+          The optimizer seeks to minimize a cost function <code>J</code> over the prediction horizon <code>N</code>.
+          The cost function penalizes deviations from the reference trajectory, excessive control effort, and rapid changes in control inputs.
+        </p>
+        <pre class="code-block">
+                                        J = Σ<sub>i=0</sub><sup>N-1</sup> [
+                                            W<sub>CTE</sub> · (CTE<sub>i</sub>)<sup>2</sup> +
+                                            W<sub>HE</sub> · (HE<sub>i</sub>)<sup>2</sup> +
+                                            W<sub>VS</sub> · (v<sub>error,i</sub>)<sup>2</sup> +
+                                            W<sub>STEER</sub> · (δ<sub>i</sub>)<sup>2</sup> +
+                                            W<sub>ACCEL</sub> · (a<sub>i</sub>)<sup>2</sup> +
+                                            W<sub>DSTEER</sub> · (Δδ<sub>i</sub>)<sup>2</sup> +
+                                            W<sub>DACCEL</sub> · (Δa<sub>i</sub>)<sup>2</sup> ]
+        </pre>
+        <p>Where:</p>
+        <ul>
+          <li><code>CTE</code>: Cross-Track Error (distance to reference path)</li>
+          <li><code>HE</code>: Heading Error (difference from reference yaw)</li>
+          <li><code>v<sub>error</sub></code>: Velocity error (difference from reference speed)</li>
+          <li><code>δ</code>: Steering angle input</li>
+          <li><code>a</code>: Acceleration input</li>
+          <li><code>Δδ</code>: Change in steering angle from the previous step</li>
+          <li><code>Δa</code>: Change in acceleration from the previous step</li>
+        </ul>
+        <p>The weights used are:</p>
+        <ul>
+          <li><code>W_CTE</code>: 5.0</li>
+          <li><code>W_HE</code>: 5.0</li>
+          <li><code>W_VS</code>: 4.0</li>
+          <li><code>W_STEER</code>: 10.0</li>
+          <li><code>W_ACCEL</code>: 1.0</li>
+          <li><code>W_DSTEER</code>: 100.0 (penalizes rapid steering changes heavily)</li>
+          <li><code>W_DACCEL</code>: 10.0</li>
+        </ul>
+
+        <h4>Optimization:</h4>
+        <p>
+          The optimal control sequence <code>[a<sub>0</sub>, δ<sub>0</sub>, ..., a<sub>N-1</sub>, δ<sub>N-1</sub>]</code>
+          is found using the Sequential Least Squares Programming (SLSQP) algorithm provided by <code>scipy.optimize.minimize</code>.
+          The optimization is subject to the defined bounds on acceleration and steering angle.
+          Only the first control action <code>(a<sub>0</sub>, δ<sub>0</sub>)</code> from the optimized sequence is applied to the vehicle,
+          and the process is repeated at the next time step (receding horizon control).
+        </p>
+
+        <h4>Reference Trajectory Generation:</h4>
+        <p>
+          At each step, a reference trajectory consisting of <code>N</code> waypoints (state <code>[x, y, ψ, v]</code> for each step in the horizon)
+          is generated. This is done by querying the CARLA map (<code>carla_map_obj</code>) for waypoints along the current lane.
+          Waypoints are projected forward based on the target speed and the MPC discretization time step (<code>MPC_DT</code>).
+          Logic is included to select the appropriate lane (e.g., second lane from the left on Town04) and handle scenarios
+          where the end of a road segment is reached within the horizon.
+        </p>
+
+        <hr style="margin: 20px 0;">
+
+        <h3>Proportional-Integral-Derivative (PID) Control</h3>
+        <p>
+          The PID control strategy is a reactive approach that continuously calculates an error value as the difference
+          between a desired setpoint and a measured process variable. It then applies a correction based on proportional,
+          integral, and derivative terms of this error.
+        </p>
+        <p>
+          Two independent PID controllers are used:
+        </p>
+        <ul>
+          <li><strong>Lateral Control (Steering):</strong> A PID controller to minimize a combined error based on heading error and cross-track error (CTE).</li>
+          <li><strong>Longitudinal Control (Throttle/Brake):</strong> A PID controller to regulate the vehicle's speed towards the target speed.</li>
+        </ul>
+
+        <h4>PID Controller Parameters & Gains:</h4>
+        <ul>
+          <li><strong>Steering PID:</strong>
+            <ul>
+              <li><code>STEER_KP</code>: 0.6</li>
+              <li><code>STEER_KI</code>: 0.005</li>
+              <li><code>STEER_KD</code>: 0.20</li>
+            </ul>
+          </li>
+          <li><strong>Throttle PID:</strong>
+            <ul>
+              <li><code>THROTTLE_KP</code>: 0.5</li>
+              <li><code>THROTTLE_KI</code>: 0.02</li>
+              <li><code>THROTTLE_KD</code>: 0.01</li>
+            </ul>
+          </li>
+          <li><strong>Integral Term Limit:</strong> ±2.0 (for anti-windup)</li>
+          <li><strong>Simulation Time Step (<code>dt</code> for PID):</strong> 0.05 seconds</li>
+        </ul>
+
+        <h4>Error Calculation:</h4>
+        <ul>
+          <li>
+            <strong>Speed Error:</strong> <code>Target Speed - Current Speed</code>.
+          </li>
+          <li>
+            <strong>Heading Error (Yaw Error):</strong> The angle between the vehicle's current heading and the direction
+            to a lookahead waypoint on the path. The lookahead distance (<code>WAYPOINT_LOOKAHEAD</code>) is <strong>12.0 meters</strong>.
+            Calculated as <code>atan2(sin(ψ<sub>target</sub> - ψ<sub>current</sub>), cos(ψ<sub>target</sub> - ψ<sub>current</sub>))</code>.
+          </li>
+          <li>
+            <strong>Cross-Track Error (CTE):</strong> The perpendicular distance from the vehicle to the center line of the target lane.
+            It's calculated by taking the dot product of the vector from the nearest waypoint on the path to the vehicle,
+            with the right-vector of that waypoint.
+          </li>
+          <li>
+            <strong>CTE Correction Angle:</strong> An additional steering correction term derived from the CTE, calculated as
+            <code>atan2(-CTE, CTE_CORRECTION_LOOKAHEAD)</code>, where <code>CTE_CORRECTION_LOOKAHEAD</code> is <strong>8.0 meters</strong>.
+            This aims to steer the vehicle back towards the centerline.
+          </li>
+          <li>
+            <strong>Combined Steering Error:</strong> The input to the steering PID controller is
+            <code>Heading Error + (CTE_CORRECTION_WEIGHT · CTE Correction Angle)</code>,
+            where <code>CTE_CORRECTION_WEIGHT</code> is <strong>0.7</strong>.
+          </li>
+        </ul>
+
+        <h4>PID Control Law:</h4>
+        <p>The standard discrete PID control law is implemented as:</p>
+        <pre class="code-block">
+                    Error<sub>k</sub> = Setpoint<sub>k</sub> - MeasuredValue<sub>k</sub>
+                    Integral<sub>k</sub> = Integral<sub>k-1</sub> + Error<sub>k</sub> · dt
+                    Derivative<sub>k</sub> = (Error<sub>k</sub> - Error<sub>k-1</sub>) / dt
+                    Output<sub>k</sub> = (K<sub>p</sub> · Error<sub>k</sub>) + (K<sub>i</sub> · Integral<sub>k</sub>) + (K<sub>d</sub> · Derivative<sub>k</sub>)
+        </pre>
+        <p>The integral term is clamped to prevent integral windup.</p>
+
+        <h4>Control Output and Logic:</h4>
+        <ul>
+          <li>Steering command (<code>steer_cmd</code>) is clamped between -1.0 and 1.0.</li>
+          <li>Throttle command (<code>throttle_cmd</code>) is clamped between 0.0 and 1.0.</li>
+          <li>
+            <strong>Braking Logic:</strong>
+            <ul>
+              <li>If <code>speed_error < -10 km/h</code> (overspeeding), brake is applied proportionally to the error, and throttle is set to 0.</li>
+              <li>If <code>abs(steer_cmd) > 0.5</code> and speed is above a threshold (40% of target speed), gentle braking is applied, and throttle is reduced.</li>
+              <li>A safety brake (0.5 brake, 0.0 throttle) is engaged if <code>abs(CTE) > 2.0 meters</code> or <code>abs(Heading Error) > 30 degrees</code> while speed is above 70 km/h.</li>
+            </ul>
+          </li>
+        </ul>
+        <h4>Path Following:</h4>
+        <p>
+          The PID controller relies on identifying the correct lane (initially the second lane from the left on Town04, with <code>target_lane_id</code>)
+          and then finding the nearest waypoint on that lane. Waypoints are projected ahead to calculate errors. Logic is included to
+          attempt to "hop" to the target lane if the vehicle strays.
+        </p>
+      </section>
+
+        <section id="methodology" style="margin-top:30px;">
+          <h2>Methodology & Data Analysis</h2>
+          <p>
+            The comparative analysis of the PID and MPC controllers was conducted through a systematic series of simulations and subsequent data processing.
+            The core methodology involved:
+          </p>
+
+          <ol>
+            <li>
+              <strong>Controller Implementation:</strong>
+              <p>
+                Python scripts were developed to implement both the PID and MPC control logics. These scripts interfaced with the CARLA simulator API to:
+              </p>
+              <ul>
+                <li>Spawn and control the 'vehicle.mercedes.coupe_2020'.</li>
+                <li>Set the CARLA world to synchronous mode with a fixed delta time of 0.05 seconds for deterministic simulations.</li>
+                <li>Generate reference waypoints for path following.</li>
+                <li>Apply calculated control commands (throttle, brake, steer) to the vehicle.</li>
+                <li>Log relevant simulation data at each time step.</li>
+              </ul>
+              <p>
+                Both controllers were tuned for high-speed operation with a focus on achieving maximum possible speed while maintaining moderate stability on the curved sections of Town04.
+              </p>
+            </li>
+
+            <li>
+              <strong>Simulation Runs:</strong>
+              <p>
+                For each controller (PID and MPC), a series of <strong>10 distinct simulation runs</strong> were executed. Each run targeted a specific constant speed, incrementing from <strong>115 km/h to 160 km/h</strong> in 5 km/h steps.
+                During each run, the vehicle attempted to complete one full lap of the predefined circuit in Town04.
+              </p>
+              <p>
+                Key data points logged during each simulation included:
+              </p>
+              <ul>
+                <li>Time (<code>sim_time_plot</code>)</li>
+                <li>Actual vehicle speed (<code>current_speed_kmh_val</code>)</li>
+                <li>Steering command (<code>steer_cmd</code>)</li>
+                <li>Throttle command (<code>throttle_cmd</code>)</li>
+                <li>Brake command (<code>brake_cmd</code>)</li>
+                <li>Cross-Track Error (CTE) (<code>cte_val_plot</code> or <code>cte</code>)</li>
+                <li>Heading Error (<code>heading_error_val_plot</code> or <code>yaw_error_rad</code>)</li>
+                <li>Actual vehicle X and Y coordinates (<code>current_carla_location.x, .y</code>)</li>
+                <li>Ideal (reference) X and Y coordinates (<code>ref_traj_np[0,0], ref_traj_np[0,1]</code> or <code>ideal_location_for_plot_carla.x, .y</code>)</li>
+              </ul>
+              <p>
+                This data was saved to CSV files, named systematically (e.g., <code>pid_data_140.csv</code>, <code>mpc_data_140.csv</code>) for each controller and target speed.
+              </p>
+            </li>
+
+            <li>
+              <strong>Data Post-Processing and Analysis:</strong>
+              <p>
+                A separate Python script utilizing <code>pandas</code> for data manipulation and <code>matplotlib</code> for plotting was developed to analyze the collected CSV data. The analysis script performed the following key operations:
+              </p>
+              <ul>
+                <li>
+                  <strong>Data Aggregation:</strong> Loaded data from all simulation runs for both PID and MPC.
+                </li>
+                <li>
+                  <strong>Time Synchronization & Interpolation:</strong>
+                  To compare runs of varying durations and ensure consistent data points for averaging, a common time grid was established based on the shortest simulation run. Data for longer runs (CTE, Heading Error, Steering, Throttle, Brake) was interpolated onto this common time grid using linear interpolation (<code>scipy.interpolate.interp1d</code>). This step was crucial for generating meaningful average performance plots over time.
+                </li>
+                <li>
+                  <strong>Calculation of Performance Metrics & Plot Generation:</strong>
+                  <ul>
+                    <li><strong>Total Simulation Time vs. Target Speed:</strong> Plotted to show how long each controller took to complete the lap at different target speeds.</li>
+                    <li><strong>Average CTE vs. Time:</strong> Averaged interpolated CTE values across all runs for each controller, plotted against the common time grid.</li>
+                    <li><strong>Average Heading Error vs. Time:</strong> Similar to CTE, averaged interpolated heading errors were plotted.</li>
+                    <li><strong>Average Steering Command vs. Time:</strong> Visualized the mean steering effort over time.</li>
+                    <li><strong>Average Throttle and Brake vs. Time:</strong> Showed mean longitudinal control effort.</li>
+                    <li><strong>Overall Average Speed:</strong> Calculated the mean speed achieved by each controller across all its runs and time points on the common grid.</li>
+                    <li><strong>Average Lane Exits per Run:</strong> Counted instances where the absolute CTE exceeded a threshold (1.5 meters) for each run, then averaged these counts per controller.</li>
+                    <li><strong>Ideal Path Visualization:</strong> Plotted the <code>x_ideal</code> and <code>y_ideal</code> coordinates from a sample run to visually inspect the track's curvature.</li>
+                  </ul>
+                </li>
+              </ul>
+              <p>
+                The live plotting capabilities within the CARLA simulation scripts (<code>setup_plots</code>, <code>update_trajectory_plot</code>, <code>update_live_data_plots</code>) also provided real-time feedback during individual runs, aiding in tuning and initial assessment. Post-simulation plots (<code>generate_post_simulation_plots</code>) offered immediate insights into CTE and heading error for each specific run.
+              </p>
+            </li>
+          </ol>
+          <p>
+            This comprehensive methodology allowed for a robust quantitative and qualitative comparison of the PID and MPC controllers across a range of challenging high-speed scenarios.
+          </p>
+        </section>
+        
+    <!-- ***** NEW VIDEO DEMONSTRATIONS SECTION STARTS HERE ***** -->
+    <section id="video-demonstrations" style="margin-top:30px;">
+      <h2>Video Demonstrations</h2>
+      <p>
+        The following videos demonstrate the comparative performance of the PID and MPC controllers in action within the CARLA simulator
+        at different target speeds. Each set of videos below presents the vehicle's behavior under PID control and MPC control
+        side-by-side for a given target speed on the Town04 circuit.
+      </p>
+
+      <div class="video-set-container" style="margin-bottom: 30px;">
+        <h3>PID vs. MPC at 115 km/h</h3>
+        <p>
+          This demonstration shows the controllers operating at a target speed of 115 km/h.
+          The left video shows the PID controller, and the right video shows the MPC controller.
+          Observe the differences in path tracking, stability, and control smoothness, particularly around the curved sections.
+        </p>
+        
+        <div class="dual-video-wrapper" style="display: flex; justify-content: space-between; gap: 15px; flex-wrap: wrap; margin-top:10px;">
+          <!-- PID Video at 115 km/h -->
+        <div class="video-player-container" style="flex: 1 1 48%; min-width: 300px;">
+          <h4 style="text-align:center; margin-bottom: 5px;">PID Controller at 115 km/h</h4>
+
+          <div class="video-wrapper">
+            <img class="video-thumbnail" src="PID 115.png" alt="Poster for PID 115">
+            <video class="hover-video" muted playsinline preload="none" controls="on">
+              <source src="PID 115.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+
+                  <!-- MPC Video at 115 km/h -->
+        <div class="video-player-container" style="flex: 1 1 48%; min-width: 300px;">
+          <h4 style="text-align:center; margin-bottom: 5px;">PID Controller at 115 km/h</h4>
+
+          <div class="video-wrapper">
+            <img class="video-thumbnail" src="MPC 115.png" alt="Poster for PID 115">
+            <video class="hover-video" muted playsinline preload="none" controls="on">
+              <source src="MPC 115.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+        </div>
+        <p style="text-align:center; margin-top: 10px;">
+            <small>Figure: Comparison of PID (left) and MPC (right) controllers at 115 km/h.</small>
+        </p>
+      </div>
+
+      <hr style="margin: 20px 0;">
+
+      <div class="video-set-container" style="margin-bottom: 30px;">
+        <h3>PID vs. MPC at 160 km/h</h3>
+        <p>
+          This demonstration showcases the controllers at a significantly higher target speed of 160 km/h.
+          The left video shows the PID controller, and the right video shows the MPC controller.
+          This more challenging scenario highlights the limits of each controller in terms of stability and
+          path adherence under aggressive cornering conditions.
+        </p>
+
+        <div class="dual-video-wrapper" style="display: flex; justify-content: space-between; gap: 15px; flex-wrap: wrap; margin-top:10px;">
+          <!-- PID Video at 160 km/h -->
+        <div class="video-player-container" style="flex: 1 1 48%; min-width: 300px;">
+          <h4 style="text-align:center; margin-bottom: 5px;">PID Controller at 115 km/h</h4>
+
+          <div class="video-wrapper">
+            <img class="video-thumbnail" src="PID 160.png" alt="Poster for PID 115">
+            <video class="hover-video" muted playsinline preload="none" controls="on">
+              <source src="PID 160.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+
+          <!-- MPC Video at 160 km/h -->
+        <div class="video-player-container" style="flex: 1 1 48%; min-width: 300px;">
+          <h4 style="text-align:center; margin-bottom: 5px;">PID Controller at 115 km/h</h4>
+
+          <div class="video-wrapper">
+            <img class="video-thumbnail" src="MPC 160.png" alt="Poster for PID 115">
+            <video class="hover-video" muted playsinline preload="none" controls="on">
+              <source src="MPC 160.mp4" type="video/mp4">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+      </div>
+        <p style="text-align:center; margin-top: 10px;">
+            <small>Figure: Comparison of PID (left) and MPC (right) controllers at 160 km/h.</small>
+        </p>
+    </section>
+
+        <!-- ***** RESULTS AND ANALYSIS SECTION STARTS HERE ***** -->
+        <section id="results-analysis" style="margin-top:30px;">
+          <h2>Results and Analysis</h2>
+          <p>
+            The performance of the PID and MPC controllers was evaluated across several key metrics.
+            Data was collected from simulations run at target speeds ranging from 115 km/h to 160 km/h on the Town04 circuit in CARLA.
+            The analysis focuses on simulation efficiency, stability (cross-track and heading error), control effort (steering, throttle, brake),
+            and overall lane-keeping performance.
+          </p>
+
+          <hr style="margin: 30px 0;">
+
+          <!-- 1. Simulation Efficiency Analysis -->
+          <article class="analysis-block">
+            <h3>1. Simulation Efficiency: Total Time vs. Target Speed</h3>
+            <p>
+              To evaluate overall performance efficiency, we measured the total simulation time required for
+              each controller to complete the driving task (one lap of the circuit) at various target speeds. Lower simulation time
+              indicates smoother path following, fewer corrections, and higher trajectory efficiency.
+            </p>
+            <figure style="text-align:center; margin: 20px 0;">
+              <img src="Sim Time vs Speed.png" alt="Plot of Total Simulation Time vs Target Speed for PID and MPC" style="max-width: 90%; height: auto; border: 1px solid #ddd; border-radius: 4px;">
+              <figcaption style="margin-top: 5px;"><small>Figure: Total simulation time for PID and MPC controllers across target speeds (115 km/h to 160 km/h).</small></figcaption>
+            </figure>
+            
+            <h4>Observations:</h4>
+            <ul>
+              <li>PID was faster at lower speeds (115–140 km/h), completing the task more quickly than MPC.</li>
+              <li>At 145 km/h and above, MPC consistently outperformed PID in terms of total time.</li>
+              <li>PID's curve exhibits a U-shape, reaching minimum time around 140 km/h and then increasing again, indicating reduced stability or more lateral correction effort at high speeds.</li>
+              <li>MPC shows a smoother decline in time up to 150 km/h, then plateaus slightly — suggesting it maintains efficient control even as speed increases.</li>
+              <li>At the highest tested speed (160 km/h), MPC completed the run ~1.5 seconds faster than PID, showing its advantage in high-speed stability.</li>
+            </ul>
+
+            <table class="summary-table" style="width:80%; margin: 20px auto; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Speed Range</th>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Faster Controller</th>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">115 – 140 km/h</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">✔ PID</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Faster response and fewer planning delays</td>
+                </tr>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">145 – 160 km/h</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">✔ MPC</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Maintained stability and smooth corrections at high speed</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h4>Conclusion:</h4>
+            <p>
+              The results show a <strong>crossover point in controller performance</strong>: while PID is more efficient at
+              moderate speeds, MPC becomes the better performer as speed increases beyond 140 km/h. This shift reflects MPC's predictive advantage — at higher velocities, where quick, stable anticipation of turns and deviations becomes critical, MPC handles the trajectory more cleanly and avoids overcorrection. These findings support the idea that:
+            </p>
+            <ul>
+              <li>PID is lightweight and responsive, ideal for low to medium-speed scenarios.</li>
+              <li>MPC excels in high-speed, curve-intensive environments, where stability and foresight matter more.</li>
+            </ul>
+          </article>
+
+          <hr style="margin: 30px 0;">
+
+          <!-- 2. Stability Analysis: CTE and Heading Error -->
+          <article class="analysis-block">
+            <h3>2. Stability Analysis: Cross-Track and Heading Error Over Time</h3>
+            <p>
+              To evaluate the trajectory stability of PID and MPC controllers, we analyzed two primary metrics over time across all simulation runs:
+            </p>
+            <ul>
+              <li><strong>Cross-Track Error (CTE):</strong> Lateral distance from the ideal path.</li>
+              <li><strong>Heading Error:</strong> Angular deviation from the ideal heading direction.</li>
+            </ul>
+            <p>
+              Each controller was evaluated across speeds from 115 km/h to 160 km/h, and the results were
+              averaged over time using a shared time grid clipped to the shortest run duration to ensure fairness.
+            </p>
+
+            <h4>Cross-Track Error (CTE) Analysis:</h4>
+            <figure style="text-align:center; margin: 20px 0;">
+              <img src="Average CTE vs Time.png" alt="Plot of Average CTE vs Time" style="max-width: 90%; height: auto; border: 1px solid #ddd; border-radius: 4px;">
+              <figcaption style="margin-top: 5px;"><small>Figure: Average Cross-Track Error (CTE) vs. Time (Clipped to Shortest Run).</small></figcaption>
+            </figure>
+            <p>The average CTE over time plot reveals that both controllers maintained relatively low lateral deviation, with some differences:</p>
+            <ul>
+              <li>MPC tended to stay slightly closer to the lane center, with consistently lower average CTE.</li>
+              <li>PID exhibited fewer oscillations, but when errors occurred, they were typically of larger magnitude.</li>
+              <li>MPC produced smaller, more frequent lateral corrections, while PID's corrections were less frequent but more aggressive.</li>
+              <li>Both controllers showed competent tracking overall, with MPC demonstrating smoother lane adherence, particularly through curve segments.</li>
+            </ul>
+
+            <h4>Heading Error Analysis:</h4>
+            <figure style="text-align:center; margin: 20px 0;">
+              <img src="Average Heading Error vs Time.png" alt="Plot of Average Heading Error vs Time" style="max-width: 90%; height: auto; border: 1px solid #ddd; border-radius: 4px;">
+              <figcaption style="margin-top: 5px;"><small>Figure: Average Heading Error vs. Time (Clipped to Shortest Run).</small></figcaption>
+            </figure>
+            <p>Heading error profiles followed a similar pattern of subtle but consistent differences:</p>
+            <ul>
+              <li>PID had slightly larger peaks in heading error, particularly during sharp turns or high-speed transitions.</li>
+              <li>MPC showed more consistent heading alignment, with smaller, smoother oscillations throughout the run.</li>
+              <li>Neither controller demonstrated extreme instability, and both returned toward zero error reasonably well after disturbances.</li>
+              <li>The difference in heading performance, while noticeable in some segments, was not dramatically significant.</li>
+            </ul>
+            
+            <table class="summary-table" style="width:80%; margin: 20px auto; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Metric</th>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">PID Controller</th>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">MPC Controller</th>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Observation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">CTE Magnitude</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Larger, less frequent deviations</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Smaller, more frequent corrections</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">MPC slightly more centered</td>
+                </tr>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Heading Error</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Slightly larger peaks during sharp turns</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">More consistent, lower-magnitude drift</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">MPC smoother overall</td>
+                </tr>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Correction Style</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Aggressive, reactive</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Gradual, predictive</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">PID quicker, MPC more stable</td>
+                </tr>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Stability</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Acceptable, but more prone to spikes</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Smoother, less variance</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">MPC marginally more stable overall</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h4>Conclusion:</h4>
+            <p>
+              Both PID and MPC controllers performed well across the full range of speeds and road geometries. While <strong>MPC showed slightly better consistency and smoother behavior, the performance gap was not dramatic</strong>. PID's responsiveness may offer advantages in highly reactive environments, whereas MPC's predictive behavior favors smoother, more stable control — particularly in high-speed or curve-dominated sections. Ultimately, both controllers are viable options for lane-keeping, with MPC offering a slight edge in stability and control smoothness, especially over longer trajectories and in more complex road segments.
+            </p>
+          </article>
+
+          <hr style="margin: 30px 0;">
+
+          <!-- 3. Steering Effort Analysis -->
+          <article class="analysis-block">
+            <h3>3. Steering Effort Analysis: Average Steering Command Over Time</h3>
+            <p>
+              To evaluate control behavior and responsiveness, we analyzed the average steering command over time across all speeds for both PID and MPC controllers. Steering effort reflects how frequently and how intensely the vehicle is being corrected, especially during turns or when recovering from deviations.
+            </p>
+            <figure style="text-align:center; margin: 20px 0;">
+              <img src="Average Steering Command vs Time.png" alt="Plot of Average Steering Command vs Time" style="max-width: 90%; height: auto; border: 1px solid #ddd; border-radius: 4px;">
+              <figcaption style="margin-top: 5px;"><small>Figure: Average Steering Command vs. Time.</small></figcaption>
+            </figure>
+
+            <h4>Observations:</h4>
+            <ul>
+              <li>PID displayed sharper, more pronounced steering changes, with noticeable spikes, particularly around the 80-second mark. These suggest aggressive corrections, likely in response to larger trajectory deviations.</li>
+              <li>MPC showed more frequent but smaller steering adjustments, maintaining a tighter control loop with a focus on predictive correction.</li>
+              <li>The MPC curve appears denser, especially between 35–55 seconds, indicating fine-grained path corrections during complex segments.</li>
+              <li>PID's effort includes fewer but larger peaks, implying more reactive control that likely corresponds to overshoots and recovery.</li>
+            </ul>
+            <p>Despite these stylistic differences, both controllers maintained overall smoothness for most of the trajectory, with <strong>no evidence of erratic or unstable steering oscillations</strong>.</p>
+
+            <table class="summary-table" style="width:80%; margin: 20px auto; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Aspect</th>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">PID Controller</th>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">MPC Controller</th>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Winner</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Peak Steering Magnitude</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Larger spikes in fewer moments</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Smaller but frequent fluctuations</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">✔ MPC (smoother)</td>
+                </tr>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Correction Frequency</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Less frequent but higher magnitude</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">More frequent, lower magnitude</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">⚖ Contextual</td>
+                </tr>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Stability</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Reactive and aggressive when needed</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Predictive, smoother adjustments</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">✔ MPC</td>
+                </tr>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Responsiveness to Curve</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Strong and impulsive</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Gradual and sustained</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">⚖ Tie</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <h4>Conclusion:</h4>
+            <p>
+              The analysis of steering effort indicates that while both controllers are effective at navigating the road, their strategies differ. PID tends to make sharper, less frequent corrections, which may lead to quicker but riskier trajectory recovery. MPC, on the other hand, distributes its control effort more evenly, applying smaller corrections more often, contributing to a more stable and smoother driving profile. This reinforces the earlier findings that <strong>MPC favors stability and smoothness</strong>, especially in high-speed or curved sections, whereas <strong>PID emphasizes responsiveness and recovery</strong>.
+            </p>
+          </article>
+
+          <hr style="margin: 30px 0;">
+
+          <!-- 4. Power Command Analysis -->
+          <article class="analysis-block">
+            <h3>4. Power Command Analysis: Throttle and Brake Over Time</h3>
+            <p>
+              To evaluate how each controller manages speed regulation and deceleration, we analyzed the average throttle and brake commands over time for both PID and MPC. These signals provide insight into how smoothly each controller modulates power and whether it relies on aggressive braking or throttle correction during curves and transitions.
+            </p>
+            <figure style="text-align:center; margin: 20px 0;">
+              <img src="Average throttle and break vs time.png" alt="Plot of Average Throttle and Brake vs Time" style="max-width: 90%; height: auto; border: 1px solid #ddd; border-radius: 4px;">
+              <figcaption style="margin-top: 5px;"><small>Figure: Average Throttle and Brake Commands vs. Time.</small></figcaption>
+            </figure>
+
+            <h4>Observations:</h4>
+            <ul>
+              <li>Throttle behavior was generally consistent across both controllers, with both showing predictable reductions during curves and rises during straight acceleration zones.</li>
+              <li>PID exhibited slightly larger and more frequent throttle oscillations, especially during transitions in the mid-run and near the 70-second mark. This indicates a more reactive adjustment style in throttle control.</li>
+              <li>MPC throttle curves were smoother, with fewer sudden changes, reflecting its predictive control logic.</li>
+              <li>Brake commands were minimal for both controllers, only spiking briefly at 2–3 points in the run.</li>
+              <li>At one instance (~75s), PID applied slightly stronger braking, but otherwise, braking behavior between the two was nearly identical and used sparingly.</li>
+            </ul>
+
+            <table class="summary-table" style="width:80%; margin: 20px auto; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Aspect</th>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">PID Controller</th>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">MPC Controller</th>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Winner</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Throttle Smoothness</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Slight oscillations in several segments</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Smoother ramp-ups and declines</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">✔ MPC</td>
+                </tr>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Brake Usage</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">A few sharper brake spikes</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Slightly softer brake responses</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">⚖ Nearly Equal</td>
+                </tr>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">Overall Power Stability</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">More reactive corrections</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">More predictive and even-handed</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">✔ MPC</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h4>Conclusion:</h4>
+            <p>
+              Both controllers demonstrate effective throttle and brake management, with <strong>minimal braking overall</strong> and appropriate throttle modulation throughout the simulation. While PID occasionally shows more throttle variability, <strong>MPC maintains smoother and more stable acceleration control</strong>. These patterns align with previous observations in trajectory and steering behavior, confirming MPC's emphasis on predictive, smooth control, while PID remains slightly more reactive but still effective.
+            </p>
+          </article>
+
+          <hr style="margin: 30px 0;">
+
+          <!-- 5. Speed and Lane Keeping Performance -->
+          <article class="analysis-block">
+            <h3>5. Speed and Lane Keeping Performance Analysis</h3>
+            <p>
+              In addition to evaluating trajectory tracking and steering smoothness, we analyzed two key performance metrics across all runs for both the PID and MPC controllers: Average Speed and Lane Exits per Run.
+            </p>
+
+            <h4>Average Speed:</h4>
+            <table class="summary-table" style="width:50%; margin: 20px auto; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Controller</th>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Average Speed</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">PID</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">120.45 km/h</td>
+                </tr>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">MPC</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">120.50 km/h</td>
+                </tr>
+              </tbody>
+            </table>
+            <p>
+              <strong>Conclusion (Average Speed):</strong> Despite differences in control behavior, both controllers maintained <strong>very similar average speeds</strong> across all runs. This suggests that neither controller significantly compromised speed in pursuit of stability or correction, and both managed throttle and braking to achieve comparable cruising performance.
+            </p>
+
+            <h4>Lane Keeping Performance (Lane Exits):</h4>
+            <p>
+              To quantify stability and safety, we counted the number of times each controller allowed the vehicle's cross-track error (CTE) to exceed ±1.5 meters — indicating that the vehicle had effectively departed the lane.
+            </p>
+            <table class="summary-table" style="width:50%; margin: 20px auto; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Controller</th>
+                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Avg Lane Exits per Run</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">PID</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">49.10</td>
+                </tr>
+                <tr>
+                  <td style="border: 1px solid #ddd; padding: 8px;">MPC</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">14.50</td>
+                </tr>
+              </tbody>
+            </table>
+            <p>The difference is substantial. <strong>PID had over three times more lane exits</strong> on average compared to MPC. This aligns with earlier findings that:</p>
+            <ul>
+              <li>PID tends to make aggressive corrections, which sometimes overshoot and lead to oscillatory drifting out of bounds.</li>
+              <li>MPC maintains smoother trajectory control with better predictive planning, allowing it to stay within lane boundaries more reliably.</li>
+            </ul>
+            <p>
+              <strong>Conclusion (Lane Exits):</strong> While both controllers achieved similar average speeds, <strong>MPC significantly outperformed PID in lane keeping stability</strong>, with far fewer lane exits per run. This makes MPC a stronger candidate for applications where safety and consistent lane tracking are critical, particularly in curved or high-speed environments.
+            </p>
+          </article>
+
+        </section>
+        <!-- ***** RESULTS AND ANALYSIS SECTION ENDS HERE ***** -->
+
+        <!-- ***** OVERALL PROJECT CONCLUSION STARTS HERE ***** -->
+        <section id="project-conclusion" style="margin-top:30px;">
+          <h2>Overall Conclusion</h2>
+          <p>
+            This comparative study of PID and Model Predictive Control (MPC) for high-speed autonomous vehicle cornering in the CARLA simulator has yielded insightful distinctions between these classical and modern control strategies.
+            Both controllers demonstrated competence in navigating the challenging Town04 circuit at speeds ranging from 115 km/h to 160 km/h, albeit with characteristic differences in performance, stability, and control behavior.
+          </p>
+
+          <h4>Performance Synthesis: A Tale of Two Controllers</h4>
+          <p>
+            The analysis revealed a clear **performance crossover point around 140 km/h**.
+            At lower to moderate speeds (115-140 km/h), the <strong>PID controller's lightweight nature and rapid responsiveness</strong> translated to slightly faster lap completion times. Its simpler architecture allowed for immediate corrective actions with minimal computational overhead.
+          </p>
+          <p>
+            However, as target speeds increased beyond this threshold (145-160 km/h), the <strong>MPC controller consistently outperformed PID in overall efficiency and stability</strong>. MPC's core strength, its predictive capability based on an internal vehicle model, became increasingly advantageous. By anticipating future trajectory requirements and optimizing control inputs over a horizon, MPC achieved:
+          </p>
+          <ul>
+            <li><strong>Smoother Trajectories:</strong> Exhibiting lower average Cross-Track Error (CTE) and more consistent heading alignment, particularly through demanding curves.</li>
+            <li><strong>Enhanced Stability:</strong> Producing smaller, more frequent corrections for both steering and throttle, leading to less variance and fewer large error spikes compared to PID's more aggressive, reactive style.</li>
+            <li><strong>Superior Lane Keeping:</strong> Demonstrating a significantly lower number of lane departures (over three times fewer than PID), a critical factor for safety and reliability in autonomous driving.</li>
+          </ul>
+          <p>
+            While both controllers maintained very similar average cruising speeds across all test conditions, indicating that neither unduly sacrificed speed for control, the qualitative aspects of their performance diverged significantly. PID's approach often involved sharper, more impulsive corrections, effective for quick recovery but sometimes leading to overshoots. MPC, in contrast, favored a more composed, even-handed application of control effort, resulting in a more stable and refined driving profile.
+          </p>
+
+          <h4>Key Takeaways and Implications:</h4>
+          <p>
+            The findings from this project underscore that the choice between PID and MPC is not absolute but rather **context-dependent**, hinging on the specific operational demands and performance priorities:
+          </p>
+          <ul>
+            <li>
+              <strong>PID remains a viable and efficient solution for scenarios prioritizing immediate responsiveness and simplicity, particularly at low to medium speeds</strong> where its reactive nature can quickly address deviations without the computational burden of predictive models.
+            </li>
+            <li>
+              <strong>MPC emerges as the superior strategy for high-speed, dynamically complex environments, especially those involving significant curvature.</strong> Its predictive foresight, ability to handle constraints, and capacity for smoother, more stable control make it a stronger candidate where safety, precision lane tracking, and ride comfort are paramount. The significantly better lane-keeping performance of MPC at higher speeds is a compelling testament to its advantages.
+            </li>
+          </ul>
+          <p>
+            Ultimately, this investigation confirms that while classical PID control offers a robust baseline, the advanced capabilities of Model Predictive Control provide a tangible edge in pushing the boundaries of autonomous vehicle performance, particularly as operational speeds and environmental complexity increase. The trade-off lies between PID's simplicity and responsiveness versus MPC's sophisticated predictive power and enhanced stability.
+          </p>
+          <p>
+            For future autonomous systems, especially those intended for highway speeds or performance driving, the nuanced, proactive control offered by MPC presents a more promising path towards achieving both high performance and robust safety.
+          </p>
+        </section>
+
+        <p style="text-align:center; margin-top: 30px;">
+          <p style="text-align: center; font-size: 13px;"> <a href="#" style="text-decoration: none; color: #1772d0;">Back to top ↑</a> </p> <!-- ***** CHANGE "index.html" to the actual URL of your main page ***** -->
+        </p>
+      </div>
+      <!-- End of New Project Content -->
+
+    </div> <!-- End container -->
+
+    <!-- Modals and Scripts from original page are kept below -->
+    <div id="imageModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.9); z-index:1000;">
+        <img id="modalImage" style="max-width:90%; max-height:90%; margin:auto; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);">
+        <span onclick="closeModal()" style="position:absolute; top:15px; right:35px; color:white; font-size:40px; cursor:pointer;">×</span>
+    </div>
+
+    <script>
+    function openModal(src) {
+        document.getElementById('imageModal').style.display = "block";
+        document.getElementById('modalImage').src = src;
+    }
+
+    function closeModal() {
+        document.getElementById('imageModal').style.display = "none";
+    }
+    </script>
+
+    <div id="videoModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.9); z-index:1000;">
+        <video id="modalVideo" controls style="max-width:90%; max-height:90%; margin:auto; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);">
+            <source src="" type="video/mp4"> <!-- Source will be set by JS -->
+        </video>
+        <span onclick="closeVideoModal()" style="position:absolute; top:15px; right:35px; color:white; font-size:40px; cursor:pointer;">×</span>
+    </div>
+
+    <script>
+    function openVideoModal(videoElementClicked) { // Changed parameter to avoid conflict with global 'video'
+        const videoModal = document.getElementById('videoModal');
+        const modalVideoPlayer = document.getElementById('modalVideo');
+        // Assuming the videoElementClicked is the <video> tag itself or its container which has a data-src or a <source> child
+        let videoSrc = videoElementClicked.dataset.src;
+        if (!videoSrc && videoElementClicked.querySelector('source')) {
+            videoSrc = videoElementClicked.querySelector('source').src;
+        } else if (!videoSrc && videoElementClicked.src) { // If the video element itself was clicked and has a src
+             videoSrc = videoElementClicked.src;
+        }
+
+        if (videoSrc) {
+            modalVideoPlayer.src = videoSrc;
+            videoModal.style.display = "block";
+            modalVideoPlayer.play();
+        } else {
+            console.error("Video source not found for modal.");
+        }
+    }
+
+    function closeVideoModal() {
+        const videoModal = document.getElementById('videoModal');
+        const modalVideoPlayer = document.getElementById('modalVideo');
+        modalVideoPlayer.pause();
+        modalVideoPlayer.src = ""; // Clear source
+        videoModal.style.display = "none";
+    }
+    </script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleSwitch = document.getElementById("theme-toggle");
+        const body = document.body;
+        const label = document.querySelector(".toggle-label");
+    
+        // Load stored theme preference
+        if (localStorage.getItem("theme") === "dark") {
+            body.classList.add("dark-mode");
+            toggleSwitch.checked = true;
+            if (label) label.textContent = "Light Mode";
+        } else {
+            if (label) label.textContent = "Dark Mode"; // Ensure label is correct on init
+        }
+    
+        toggleSwitch.addEventListener("change", function () {
+            if (this.checked) {
+                body.classList.add("dark-mode");
+                localStorage.setItem("theme", "dark");
+                if (label) label.textContent = "Light Mode";
+            } else {
+                body.classList.remove("dark-mode");
+                localStorage.setItem("theme", "light");
+                if (label) label.textContent = "Dark Mode";
+            }
+        });
+    });
+    </script>
+
+    <script>
+      // This script was for project video hovers on your main page.
+      // It shouldn't cause errors here, but it won't do anything as .project elements are not on this page.
+      const tooltip = document.querySelector('.click-to-expand');
+      const projects = document.querySelectorAll('.project');
+
+      projects.forEach(project => {
+        const video = project.querySelector('.project-video');
+        if (!video || video.classList.contains('static-video')) return;
+
+        let sourceAdded = false;
+
+        project.addEventListener('mouseenter', () => {
+          if (!sourceAdded && video.dataset.src) {
+            const source = document.createElement('source');
+            source.src = video.dataset.src;
+            source.type = 'video/mp4';
+            video.appendChild(source);
+            video.load(); // Important to load after adding source
+            sourceAdded = true;
+          }
+          // Check if video is ready to play to avoid errors
+          if (video.readyState >= 2) { // HAVE_CURRENT_DATA or more
+            video.play().catch(e => console.warn("Video play interrupted or failed:", e));
+          } else {
+            video.oncanplay = () => video.play().catch(e => console.warn("Video play interrupted or failed (oncanplay):", e));
+          }
+        });
+
+        project.addEventListener('mouseleave', () => {
+          video.pause();
+          video.currentTime = 0;
+          video.removeAttribute('controls');
+          if (tooltip) tooltip.style.opacity = '0';
+        });
+
+        if (tooltip) {
+            video.addEventListener('mouseenter', () => {
+            tooltip.style.opacity = '1';
+            video.setAttribute('controls', 'controls');
+            });
+
+            video.addEventListener('mousemove', (e) => {
+            // Position tooltip relative to the viewport
+            tooltip.style.top = `${e.clientY + 15}px`; // Adjust offset as needed
+            tooltip.style.left = `${e.clientX + 15}px`; // Adjust offset as needed
+            });
+
+            video.addEventListener('mouseleave', () => {
+            tooltip.style.opacity = '0';
+            video.removeAttribute('controls');
+            });
+        }
+      });
+    </script>
+<script>
+  document.querySelectorAll('.video-wrapper').forEach(wrapper => {
+    const img = wrapper.querySelector('.video-thumbnail');
+    const video = wrapper.querySelector('.hover-video');
+
+    function revealAndPlay() {
+      if (video.style.display !== 'block') {
+        img.style.display = 'none';
+        video.style.display = 'block';
+        video.play();
+      }
+    }
+
+    img.addEventListener('click', revealAndPlay);
+    img.addEventListener('mouseenter', revealAndPlay);
+  });
+</script>
+  </body>
+</html>

@@ -469,10 +469,14 @@ input:checked + .slider:before {
 /* Light mode default for code blocks */
 .code-block {
   background-color: #f0f0f0;
-  padding: 10px;
+  padding: 15px;
   border-radius: 5px;
   font-family: monospace;
-  color: #000; /* optional: set black text in light mode */
+  color: #000;
+  overflow-x: auto;
+  white-space: pre;
+  max-width: 100%; 
+  box-sizing: border-box;
 }
 
 /* Dark mode override */

@@ -333,7 +333,7 @@ input:checked + .slider:before {
 .navbar-center {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: clamp(10px, 4vw, 30px);
   height: 100%;
   width: 100%;

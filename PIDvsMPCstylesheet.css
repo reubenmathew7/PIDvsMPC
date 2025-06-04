@@ -345,9 +345,6 @@ input:checked + .slider:before {
   color: #1772d0;
   font-weight: bold;
   font-size: 17px;
-  height: auto;
-  width: 100%;
-  flex-wrap: wrap;
 }
 
 .navbar-center a:hover {

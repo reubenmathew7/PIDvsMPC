@@ -423,7 +423,7 @@ input:checked + .slider:before {
 
 .project-video {
   width: 100%;
-  aspect-ratio: 16 / 9; /* or same ratio used for others */
+  aspect-ratio: 16 / 9;
   object-fit: cover;
   border-radius: 10px;
   display: block;

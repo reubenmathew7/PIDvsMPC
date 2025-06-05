@@ -19,7 +19,7 @@
     <div class="container">
       <nav class="navbar">
         <div class="navbar-center">
-          <a href="https://reubenmathew7.github.io/">Home</a>
+          <a href="index.html">Home</a>
           <a href="#control-methodology">Methodology and Control</a>
           <a href="#video-demonstrations">Video Demonstration</a>
           <a href="#results-analysis">Results</a>
@@ -34,7 +34,8 @@
       </nav>
   
       <!-- Start of Project Content -->
-      <div style="width:100%;max-width:800px;margin-right:auto;margin-left:auto;padding:20px 2.5%;">
+    <div class="project-content-wrapper">
+      <div>
         <h1 class="name" style="text-align: center;"> Comparative Analysis of PID and Model Predictive Control for High-Speed Vehicle Cornering in CARLA</h1>
         <p style="text-align:center;">
           <strong>Course:</strong> ME 548 – Linear Multivariable Control &nbsp; | &nbsp;
@@ -192,10 +193,10 @@
         <p style="text-align:center;"><small>Figure: Kinematic Bicycle Model</small></p>
         <p>The discrete-time state update equations are:</p>
         <pre class="code-block">
-                                    x<sub>k+1</sub> = x<sub>k</sub> + v<sub>k</sub> · cos(ψ<sub>k</sub>) · dt
-                                    y<sub>k+1</sub> = y<sub>k</sub> + v<sub>k</sub> · sin(ψ<sub>k</sub>) · dt
-                                    ψ<sub>k+1</sub> = ψ<sub>k</sub> + (v<sub>k</sub> / L) · tan(δ<sub>k</sub>) · dt
-                                    v<sub>k+1</sub> = v<sub>k</sub> + a<sub>k</sub> · dt
+                                x<sub>k+1</sub> = x<sub>k</sub> + v<sub>k</sub> · cos(ψ<sub>k</sub>) · dt
+                                y<sub>k+1</sub> = y<sub>k</sub> + v<sub>k</sub> · sin(ψ<sub>k</sub>) · dt
+                                ψ<sub>k+1</sub> = ψ<sub>k</sub> + (v<sub>k</sub> / L) · tan(δ<sub>k</sub>) · dt
+                                v<sub>k+1</sub> = v<sub>k</sub> + a<sub>k</sub> · dt
         </pre>
         <p>Where <code>L</code> is the wheelbase and <code>dt</code> is the time step.</p>
 
@@ -205,14 +206,14 @@
           The cost function penalizes deviations from the reference trajectory, excessive control effort, and rapid changes in control inputs.
         </p>
         <pre class="code-block">
-                                        J = Σ<sub>i=0</sub><sup>N-1</sup> [
-                                            W<sub>CTE</sub> · (CTE<sub>i</sub>)<sup>2</sup> +
-                                            W<sub>HE</sub> · (HE<sub>i</sub>)<sup>2</sup> +
-                                            W<sub>VS</sub> · (v<sub>error,i</sub>)<sup>2</sup> +
-                                            W<sub>STEER</sub> · (δ<sub>i</sub>)<sup>2</sup> +
-                                            W<sub>ACCEL</sub> · (a<sub>i</sub>)<sup>2</sup> +
-                                            W<sub>DSTEER</sub> · (Δδ<sub>i</sub>)<sup>2</sup> +
-                                            W<sub>DACCEL</sub> · (Δa<sub>i</sub>)<sup>2</sup> ]
+                                    J = Σ<sub>i=0</sub><sup>N-1</sup> [
+                                        W<sub>CTE</sub> · (CTE<sub>i</sub>)<sup>2</sup> +
+                                        W<sub>HE</sub> · (HE<sub>i</sub>)<sup>2</sup> +
+                                        W<sub>VS</sub> · (v<sub>error,i</sub>)<sup>2</sup> +
+                                        W<sub>STEER</sub> · (δ<sub>i</sub>)<sup>2</sup> +
+                                        W<sub>ACCEL</sub> · (a<sub>i</sub>)<sup>2</sup> +
+                                        W<sub>DSTEER</sub> · (Δδ<sub>i</sub>)<sup>2</sup> +
+                                        W<sub>DACCEL</sub> · (Δa<sub>i</sub>)<sup>2</sup> ]
         </pre>
         <p>Where:</p>
         <ul>
@@ -319,10 +320,10 @@
         <h4>PID Control Law:</h4>
         <p>The standard discrete PID control law is implemented as:</p>
         <pre class="code-block">
-                    Error<sub>k</sub> = Setpoint<sub>k</sub> - MeasuredValue<sub>k</sub>
-                    Integral<sub>k</sub> = Integral<sub>k-1</sub> + Error<sub>k</sub> · dt
-                    Derivative<sub>k</sub> = (Error<sub>k</sub> - Error<sub>k-1</sub>) / dt
-                    Output<sub>k</sub> = (K<sub>p</sub> · Error<sub>k</sub>) + (K<sub>i</sub> · Integral<sub>k</sub>) + (K<sub>d</sub> · Derivative<sub>k</sub>)
+                 Error<sub>k</sub> = Setpoint<sub>k</sub> - MeasuredValue<sub>k</sub>
+                 Integral<sub>k</sub> = Integral<sub>k-1</sub> + Error<sub>k</sub> · dt
+                 Derivative<sub>k</sub> = (Error<sub>k</sub> - Error<sub>k-1</sub>) / dt
+                 Output<sub>k</sub> = (K<sub>p</sub> · Error<sub>k</sub>) + (K<sub>i</sub> · Integral<sub>k</sub>) + (K<sub>d</sub> · Derivative<sub>k</sub>)
         </pre>
         <p>The integral term is clamped to prevent integral windup.</p>
 
@@ -953,6 +954,7 @@
           <p style="text-align: center; font-size: 13px;"> <a href="#" style="text-decoration: none; color: #1772d0;">Back to top ↑</a> </p>
         </p>
       </div>
+    </div>
        
 
     </div>

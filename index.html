@@ -88,6 +88,10 @@
           <li>To assess responsiveness and control smoothness using steering, throttle, and brake effort.</li>
           <li>To determine which controller maintains higher stability and performance across increasing speeds.</li>
           <li>To provide visual and statistical evidence for controller behavior and effectiveness using simulation data.</li>
+          <li>
+          <strong>Vehicle Dynamics Model:</strong> Control logic is based on an ideal kinematic bicycle model. Effects such as tire slip, actuator delay, or dynamic load transfer are not considered.
+          Specifically, vehicle drift dynamics were not incorporated into the MPC model due to the highly non-linear nature of drift, which would significantly overcomplicate the control problem and was considered beyond the scope of this project. While the simulated vehicle may exhibit drift at high speeds, the controller does not explicitly model or compensate for it. This could be an area for future enhancement.
+          </li>
         </ul>
 
         <h2>Simulation Environment</h2>
@@ -97,7 +101,7 @@
         </p>
         <p>
           The vehicle used was the <strong>Mercedes Coupe 2020</strong> from the CARLA vehicle blueprint library. The simulation took place in 
-          <a href="https://carla.readthedocs.io/en/latest/map_town04/" target="_blank" rel="noopener noreferrer"><strong>Town 4</strong></a>, 
+          <a href="https://carla.readthedocs.io/en/latest/map_town04/" target="_blank" rel="noopener noreferrer"><strong>Town04</strong></a>, 
           which includes two distinct types of curved segments:
         </p>
 

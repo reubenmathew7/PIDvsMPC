@@ -156,41 +156,6 @@ span.highlight {
   -webkit-transition: opacity .2s ease-in-out;
 }
 
-/* Media query for narrow screens */
-@media screen and (max-width: 768px) {
-    video, .one, .two, img {
-        width: 110px;
-        height: auto;
-        position: relative;
-    }
-}
-
-/* For larger phones and small tablets */
-@media screen and (max-width: 768px) {
-  video, .one, .two, img {
-      width: 110px;
-      height: auto;
-      position: relative;
-  }
-}
-
-/* For medium-sized phones */
-@media screen and (max-width: 500px) {
-  video, .one, .two, img {
-      width: 90px;
-      height: auto;
-      position: relative;
-  }
-}
-
-/* For smaller phones */
-@media screen and (max-width: 375px) {
-  video, .one, .two, img {
-      width: 70px;
-      height: auto;
-      position: relative;
-  }
-}
 
 video::-webkit-media-controls-volume-slider {
   display: none;
@@ -255,21 +220,6 @@ input:checked + .slider:before {
   transform: translateX(16px);
   background-color: #121212;
 }
-@media (max-width: 480px) {
-  .switch {
-    width: 40px;
-    height: 20px;
-  }
-
-  .slider:before {
-    width: 16px;
-    height: 16px;
-  }
-
-  input:checked + .slider:before {
-    transform: translateX(20px);
-  }
-}
 
 /* ========== DARK MODE STYLES ========== */
 
@@ -315,6 +265,12 @@ input:checked + .slider:before {
   max-width: 800px;
   margin: 0 auto;
   padding: 0 15px;
+}
+
+.project-content-wrapper {
+  max-width: 800px; /* Same as your main site's content tables */
+  margin: 20px auto;  /* Centers the block, adds some top/bottom margin */
+  padding: 0 20px;  /* Adds side padding like your main site's container */
 }
 
 .navbar {
@@ -423,7 +379,7 @@ input:checked + .slider:before {
 
 .project-video {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 9; /* or same ratio used for others */
   object-fit: cover;
   border-radius: 10px;
   display: block;
@@ -476,7 +432,8 @@ input:checked + .slider:before {
   color: #000;
   overflow-x: auto;
   white-space: pre;
-  max-width: 100%; 
+  
+  max-width: 100%;
   box-sizing: border-box;
 }
 
@@ -484,6 +441,7 @@ input:checked + .slider:before {
 .dark-mode .code-block {
   background-color: #1e1e1e;
   color: #f0f0f0;
+  border: 1px solid #333;
 }
 
 .video-wrapper {
@@ -518,3 +476,4 @@ input:checked + .slider:before {
   z-index: 1;
   border-radius: 6px;
 }
+

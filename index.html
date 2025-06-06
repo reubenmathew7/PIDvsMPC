@@ -19,7 +19,7 @@
     <div class="container">
       <nav class="navbar">
         <div class="navbar-center">
-          <a href="https://reubenmathew7.github.io/">Home</a>
+          <a href="index.html">Home</a>
           <a href="#control-methodology">Methodology and Control</a>
           <a href="#video-demonstrations">Video Demonstration</a>
           <a href="#results-analysis">Results</a>
@@ -133,8 +133,9 @@
           <li><strong>Single-Agent Control:</strong> The vehicle operates in a static, obstacle-free environment with no interaction with other agents or traffic.</li>
           <li><strong>Vehicle Dynamics Model:</strong> Control logic is based on an ideal kinematic bicycle model. Effects such as tire slip, actuator delay, or dynamic load transfer are not considered.</li>
           <li><strong>Failure Criteria and Speed Limit:</strong> Drifts of up to 90° from the lane heading are considered valid. Any yaw deviation beyond 90° by both the vehicles, or collisions with stationary objects, are treated as failure conditions. Based on empirical testing on the Town04 track, the maximum reliably achievable speed was found to be 160 km/h for atleast one of the cars.</li>
-          <li><strong>Vehicle Dynamics Model:</strong> Control logic is based on an ideal kinematic bicycle model. Effects such as tire slip, actuator delay, or dynamic load transfer are not considered.
-          Specifically, vehicle drift dynamics were not incorporated into the MPC model due to the highly non-linear nature of drift, which would significantly overcomplicate the control problem and was considered beyond the scope of this project. While the simulated vehicle may exhibit drift at high speeds, the controller does not explicitly model or compensate for it. This could be an area for future enhancement.
+          <li>
+            <strong>Vehicle Dynamics Model:</strong> Control logic is based on an ideal kinematic bicycle model. Effects such as tire slip, actuator delay, or dynamic load transfer are not considered.
+            Specifically, vehicle drift dynamics were not incorporated into the MPC model due to the highly non-linear nature of drift, which would significantly overcomplicate the control problem and was considered beyond the scope of this project. While the simulated vehicle may exhibit drift at high speeds, the controller does not explicitly model or compensate for it. This could be an area for future enhancement.
           </li>
         </ul>
 
@@ -559,27 +560,29 @@
               <li>At the upper limit of the tested speed range (160 km/h), MPC completed the lap approximately <strong>3.5 seconds faster</strong> than PID, highlighting its enhanced stability and efficiency under high-speed conditions.</li>
             </ul>
 
-            <table class="summary-table" style="width:80%; margin: 20px auto; border-collapse: collapse;">
-              <thead>
-                <tr>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Speed Range</th>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Controller with Lower Lap Time</th>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Attributed Factors</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">115 – 140 km/h</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">PID</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Rapid response characteristics, minimal computational overhead for planning</td>
-                </tr>
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">145 – 160 km/h</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">MPC</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Superior high-speed stability, smoother corrective actions due to predictive capability</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="table-responsive-wrapper">
+              <table class="summary-table">
+                  <thead>
+                      <tr>
+                          <th>Speed Range</th>
+                          <th>Controller with Lower Lap Time</th>
+                          <th>Attributed Factors</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr>
+                          <td>115 – 140 km/h</td>
+                          <td>PID</td>
+                          <td>Rapid response characteristics, minimal computational overhead for planning</td>
+                      </tr>
+                      <tr>
+                          <td>145 – 160 km/h</td>
+                          <td>MPC</td>
+                          <td>Superior high-speed stability, smoother corrective actions due to predictive capability</td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
 
             <h4>Conclusion on Simulation Efficiency:</h4>
             <p>
@@ -627,42 +630,44 @@
               <li>While discernible differences in heading performance were present, particularly in challenging track segments, the overall disparity was not substantial.</li>
             </ul>
             
-            <table class="summary-table" style="width:80%; margin: 20px auto; border-collapse: collapse;">
-              <thead>
-                <tr>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Metric</th>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">PID Controller Characteristics</th>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">MPC Controller Characteristics</th>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Comparative Summary</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">CTE Magnitude & Frequency</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Larger, less frequent deviations</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Smaller, more frequent corrections</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">MPC achieved slightly better centering; PID's errors were less frequent but larger.</td>
-                </tr>
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Heading Error Profile</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Slightly larger peaks, especially during sharp turns</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">More consistent alignment, lower-magnitude drift</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">MPC demonstrated a smoother overall heading error profile.</td>
-                </tr>
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Correction Style</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Aggressive, reactive to errors</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Gradual, predictive adjustments</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">PID exhibited quicker initial reaction; MPC showed more stable corrective phases.</td>
-                </tr>
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Overall Path Stability</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Generally stable, but more susceptible to error spikes</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Higher consistency, reduced error variance</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">MPC demonstrated marginally superior overall stability and smoothness.</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="table-responsive-wrapper">
+              <table class="summary-table">
+                  <thead>
+                      <tr>
+                          <th style="border: 1px solid #ddd; padding: 8px;">Metric</th>
+                          <th style="border: 1px solid #ddd; padding: 8px;">PID Controller Characteristics</th>
+                          <th style="border: 1px solid #ddd; padding: 8px;">MPC Controller Characteristics</th>
+                          <th style="border: 1px solid #ddd; padding: 8px;">Comparative Summary</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr>
+                          <td style="border: 1px solid #ddd; padding: 8px;">CTE Magnitude & Frequency</td>
+                          <td style="border: 1px solid #ddd; padding: 8px;">Larger, less frequent deviations</td>
+                          <td style="border: 1px solid #ddd; padding: 8px;">Smaller, more frequent corrections</td>
+                          <td style="border: 1px solid #ddd; padding: 8px;">MPC achieved slightly better centering; PID's errors were less frequent but larger.</td>
+                      </tr>
+                      <tr>
+                          <td style="border: 1px solid #ddd; padding: 8px;">Heading Error Profile</td>
+                          <td style="border: 1px solid #ddd; padding: 8px;">Slightly larger peaks, especially during sharp turns</td>
+                          <td style="border: 1px solid #ddd; padding: 8px;">More consistent alignment, lower-magnitude drift</td>
+                          <td style="border: 1px solid #ddd; padding: 8px;">MPC demonstrated a smoother overall heading error profile.</td>
+                      </tr>
+                      <tr>
+                          <td style="border: 1px solid #ddd; padding: 8px;">Correction Style</td>
+                          <td style="border: 1px solid #ddd; padding: 8px;">Aggressive, reactive to errors</td>
+                          <td style="border: 1px solid #ddd; padding: 8px;">Gradual, predictive adjustments</td>
+                          <td style="border: 1px solid #ddd; padding: 8px;">PID exhibited quicker initial reaction; MPC showed more stable corrective phases.</td>
+                      </tr>
+                      <tr>
+                          <td style="border: 1px solid #ddd; padding: 8px;">Overall Path Stability</td>
+                          <td style="border: 1px solid #ddd; padding: 8px;">Generally stable, but more susceptible to error spikes</td>
+                          <td style="border: 1px solid #ddd; padding: 8px;">Higher consistency, reduced error variance</td>
+                          <td style="border: 1px solid #ddd; padding: 8px;">MPC demonstrated marginally superior overall stability and smoothness.</td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
 
             <h4>Conclusion on Stability:</h4>
             <p>
@@ -692,42 +697,44 @@
             </ul>
             <p>Despite these contrasting stylistic approaches to steering control, it is noteworthy that both controllers maintained overall trajectory smoothness, with <strong>no evidence of erratic or unstable steering oscillations</strong> that would compromise vehicle stability or passenger comfort.</p>
 
-            <table class="summary-table" style="width:80%; margin: 20px auto; border-collapse: collapse;">
+      <div class="table-responsive-wrapper">
+          <table class="summary-table">
               <thead>
-                <tr>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Aspect</th>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">PID Controller Steering Profile</th>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">MPC Controller Steering Profile</th>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Comparative Steering Behavior</th>
-                </tr>
+                  <tr>
+                      <th style="border: 1px solid #ddd; padding: 8px;">Aspect</th>
+                      <th style="border: 1px solid #ddd; padding: 8px;">PID Controller Steering Profile</th>
+                      <th style="border: 1px solid #ddd; padding: 8px;">MPC Controller Steering Profile</th>
+                      <th style="border: 1px solid #ddd; padding: 8px;">Comparative Steering Behavior</th>
+                  </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Peak Steering Magnitude</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Larger spikes, occurring less frequently</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Smaller, more frequent fluctuations</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">MPC exhibited smoother steering inputs with lower peak magnitudes.</td>
-                </tr>
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Correction Frequency & Intensity</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Less frequent, higher magnitude corrections</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">More frequent, lower magnitude corrections</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Strategies differed: PID was reactive and forceful; MPC was proactive and incremental.</td>
-                </tr>
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Steering Stability & Smoothness</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Reactive, aggressive when necessary</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Predictive, yielding smoother adjustments</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Both demonstrated relatively stable and smooth steering control.</td>
-                </tr>
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Response to Curves</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Strong, impulsive steering initiation</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Gradual, sustained steering application</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Both effective; PID offered sharper turn-in, MPC smoother negotiation.</td>
-                </tr>
+                  <tr>
+                      <td style="border: 1px solid #ddd; padding: 8px;">Peak Steering Magnitude</td>
+                      <td style="border: 1px solid #ddd; padding: 8px;">Larger spikes, occurring less frequently</td>
+                      <td style="border: 1px solid #ddd; padding: 8px;">Smaller, more frequent fluctuations</td>
+                      <td style="border: 1px solid #ddd; padding: 8px;">MPC exhibited smoother steering inputs with lower peak magnitudes.</td>
+                  </tr>
+                  <tr>
+                      <td style="border: 1px solid #ddd; padding: 8px;">Correction Frequency & Intensity</td>
+                      <td style="border: 1px solid #ddd; padding: 8px;">Less frequent, higher magnitude corrections</td>
+                      <td style="border: 1px solid #ddd; padding: 8px;">More frequent, lower magnitude corrections</td>
+                      <td style="border: 1px solid #ddd; padding: 8px;">Strategies differed: PID was reactive and forceful; MPC was proactive and incremental.</td>
+                  </tr>
+                  <tr>
+                      <td style="border: 1px solid #ddd; padding: 8px;">Steering Stability & Smoothness</td>
+                      <td style="border: 1px solid #ddd; padding: 8px;">Reactive, aggressive when necessary</td>
+                      <td style="border: 1px solid #ddd; padding: 8px;">Predictive, yielding smoother adjustments</td>
+                      <td style="border: 1px solid #ddd; padding: 8px;">Both demonstrated relatively stable and smooth steering control.</td>
+                  </tr>
+                  <tr>
+                      <td style="border: 1px solid #ddd; padding: 8px;">Response to Curves</td>
+                      <td style="border: 1px solid #ddd; padding: 8px;">Strong, impulsive steering initiation</td>
+                      <td style="border: 1px solid #ddd; padding: 8px;">Gradual, sustained steering application</td>
+                      <td style="border: 1px solid #ddd; padding: 8px;">Both effective; PID offered sharper turn-in, MPC smoother negotiation.</td>
+                  </tr>
               </tbody>
-            </table>
+          </table>
+      </div>
             
             <h4>Conclusion on Steering Effort:</h4>
             <p>
@@ -757,36 +764,38 @@
               <li>In a specific instance around the 75-second mark, PID engaged marginally stronger braking; however, apart from this, braking patterns were nearly identical and infrequently utilized by both systems.</li>
             </ul>
 
-            <table class="summary-table" style="width:80%; margin: 20px auto; border-collapse: collapse;">
-              <thead>
-                <tr>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Aspect</th>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">PID Controller Power Profile</th>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">MPC Controller Power Profile</th>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Comparative Power Management</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Throttle Smoothness</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Minor oscillations observed in several segments</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Smoother ramp-ups and declines in throttle application</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">MPC provided smoother throttle modulation.</td>
-                </tr>
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Brake Usage</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Few, sharper brake spikes</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Slightly softer, infrequent brake responses</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Both used brakes sparingly; differences were minimal.</td>
-                </tr>
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">Overall Power Stability</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">More reactive throttle adjustments</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">More predictive and even-handed power delivery</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">MPC demonstrated more stable and predictive power control.</td>
-                </tr>
-              </tbody>
+        <div class="table-responsive-wrapper">
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Aspect</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">PID Controller Power Profile</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">MPC Controller Power Profile</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Comparative Power Management</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Throttle Smoothness</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Minor oscillations observed in several segments</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Smoother ramp-ups and declines in throttle application</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">MPC provided smoother throttle modulation.</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Brake Usage</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Few, sharper brake spikes</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Slightly softer, infrequent brake responses</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Both used brakes sparingly; differences were minimal.</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Overall Power Stability</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">More reactive throttle adjustments</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">More predictive and even-handed power delivery</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">MPC demonstrated more stable and predictive power control.</td>
+                    </tr>
+                </tbody>
             </table>
+        </div>
 
             <h4>Conclusion on Power Command:</h4>
             <p>
@@ -804,24 +813,26 @@
             </p>
 
             <h4>Average Speed Maintained:</h4>
-            <table class="summary-table" style="width:50%; margin: 20px auto; border-collapse: collapse;">
-               <thead>
-                <tr>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Controller</th>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Average Speed</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">PID</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">120.45 km/h</td>
-                </tr>
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">MPC</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">120.50 km/h</td>
-                </tr>
-              </tbody>
+        <div class="table-responsive-wrapper">
+            <table class="summary-table">
+                <thead>
+                    <tr>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Controller</th>
+                        <th style="border: 1px solid #ddd; padding: 8px;">Average Speed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">PID</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">120.45 km/h</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">MPC</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">120.50 km/h</td>
+                    </tr>
+                </tbody>
             </table>
+        </div>
             <p>
               <strong>Conclusion on Average Speed:</strong> Despite discernible differences in control behavior and trajectory smoothness, both controllers achieved <strong>remarkably similar average speeds</strong> across the entirety of the test runs. This suggests that neither strategy significantly compromised longitudinal performance in pursuit of stability or corrective precision, and both effectively managed throttle and brake inputs to sustain comparable cruising velocities.
             </p>
@@ -830,24 +841,26 @@
             <p>
               To quantify path adherence and safety, the number of instances where each controller allowed the vehicle's cross-track error (CTE) to exceed a threshold of ±1.5 meters was recorded. Such an event was defined as the vehicle effectively departing its designated lane.
             </p>
-            <table class="summary-table" style="width:50%; margin: 20px auto; border-collapse: collapse;">
-              <thead>
-                <tr>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Controller</th>
-                  <th style="border: 1px solid #ddd; padding: 8px; text-align:left;">Average Lane Exits per Run</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">PID</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">49.10</td>
-                </tr>
-                <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">MPC</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">14.50</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="table-responsive-wrapper">
+              <table class="summary-table">
+                  <thead>
+                      <tr>
+                          <th style="border: 1px solid #ddd; padding: 8px;">Controller</th>
+                          <th style="border: 1px solid #ddd; padding: 8px;">Average Lane Exits per Run</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr>
+                          <td style="border: 1px solid #ddd; padding: 8px;">PID</td>
+                          <td style="border: 1px solid #ddd; padding: 8px;">49.10</td>
+                      </tr>
+                      <tr>
+                          <td style="border: 1px solid #ddd; padding: 8px;">MPC</td>
+                          <td style="border: 1px solid #ddd; padding: 8px;">14.50</td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
             <p>The disparity in lane exit frequency is substantial: <strong>PID resulted in over three times more lane departures</strong> on average when compared to MPC. This observation aligns coherently with earlier findings indicating that:</p>
             <ul>
               <li>PID's tendency towards aggressive corrective actions can occasionally lead to overshoots and subsequent oscillatory drifting beyond lane boundaries.</li>
